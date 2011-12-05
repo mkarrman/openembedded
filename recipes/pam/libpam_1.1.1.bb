@@ -15,7 +15,7 @@ DEPENDS = "flex flex-native"
 # PAM is not a lot of use without configuration files and the plugins
 RRECOMMENDS_${PN} = "libpam-meta libpam-base-files"
 
-PR = "r2"
+PR = "r3"
 
 # The project is actually called Linux-PAM but that gives
 # a bad OE package name because of the upper case characters
@@ -26,6 +26,7 @@ S = "${WORKDIR}/${p}"
 SRC_URI = "${KERNELORG_MIRROR}/pub/linux/libs/pam/library/${p}.tar.bz2 \
            file://pam-nodocs.patch \
            file://define-HAVE_DBM.patch \
+           file://05_libpam \
           "
 
 UCLIBC_PATCHES = " file://Linux-PAM-1.1.0-uclibc.patch \
@@ -71,6 +72,17 @@ python populate_packages_prepend () {
 	packages.append(metapkg)
 	bb.data.setVar('PACKAGES', ' '.join(packages), d)
 }
+
+do_install_append () {
+    # Remove erroneously created /var/run dir
+    rm -rf ${D}${localstatedir}/run
+
+    # Install volatiles specification to make sure dir is created in run-time
+    install -d ${D}${sysconfdir}/default
+    install -d ${D}${sysconfdir}/default/volatiles
+    install -m 0644  ${WORKDIR}/05_libpam  ${D}${sysconfdir}/default/volatiles/
+}
+
 SRC_URI[md5sum] = "9b3d952b173d5b9836cbc7e8de108bee"
 SRC_URI[sha256sum] = "608d3eb9d7a5e1a7505fff62e6a583fdb6e52dc05bf54dc9661c5f395b1fb904"
 

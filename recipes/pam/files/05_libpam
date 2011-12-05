@@ -1,0 +1,3 @@
+# Create sepermit folder in volatile fs
+d root root 0755 /var/run/sepermit none
+
